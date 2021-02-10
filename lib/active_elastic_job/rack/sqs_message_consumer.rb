@@ -34,17 +34,22 @@ module ActiveElasticJob
       def call(env) #:nodoc:
         request = ActionDispatch::Request.new env
         if enabled? && aws_sqsd?(request)
-          # unless request.local? || sent_from_docker_host?(request)
-          #   return FORBIDDEN_RESPONSE
-          # end
+          unless request.local? || sent_from_docker_host?(request)
+            Rails.logger.info("REQUEST IS NOT LOCAL OR FROM THE DOMAIN")
+            return FORBIDDEN_RESPONSE
+          end
+
+          from_gem = originates_from_gem?(request)
+          Rails.logger.info("FROM GEM #{from_gem}")
 
           if periodic_task?(request)
             execute_periodic_task(request)
             return OK_RESPONSE
-          elsif originates_from_gem?(request)
+          elsif from_gem
             begin
               execute_job(request)
             rescue ActiveElasticJob::MessageVerifier::InvalidDigest => e
+              Rails.logger.info("DIGEST FAILED #{e}")
               return FORBIDDEN_RESPONSE
             end
             return OK_RESPONSE
