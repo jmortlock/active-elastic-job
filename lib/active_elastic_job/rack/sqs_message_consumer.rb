@@ -35,7 +35,7 @@ module ActiveElasticJob
         request = ActionDispatch::Request.new env
         if enabled? && aws_sqsd?(request)
           Rails.logger.info("REQUEST IS LOCAL #{request.local?}")
-          Rails.logger.info("REMOTE IP: #{request.remote_ip}, REMOTE ADDR: #{request.remote_ip}, LOCALHOST: #{ActionDispatch::Request::LOCALHOST}")
+          Rails.logger.info("REMOTE IP: #{request.remote_ip}, REMOTE ADDR: #{request.remote_addr}, LOCALHOST: #{ActionDispatch::Request::LOCALHOST}")
           Rails.logger.info("******************")
           unless request.local? || sent_from_docker_host?(request)
             Rails.logger.info("REQUEST IS NOT LOCAL OR FROM THE DOMAIN")
