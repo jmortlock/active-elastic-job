@@ -34,6 +34,9 @@ module ActiveElasticJob
       def call(env) #:nodoc:
         request = ActionDispatch::Request.new env
         if enabled? && aws_sqsd?(request)
+          Rails.logger.info("REQUEST IS LOCAL #{request.local?}")
+          Rails.logger.info("#{request}")
+          Rails.logger.info("******************")
           unless request.local? || sent_from_docker_host?(request)
             Rails.logger.info("REQUEST IS NOT LOCAL OR FROM THE DOMAIN")
             return FORBIDDEN_RESPONSE
@@ -105,7 +108,7 @@ module ActiveElasticJob
         verify!(request)
         Rails.logger('LOAD JSON');
         job = JSON.load(request.body)
-        Rails.logger('EXECUTE JOB');        
+        Rails.logger('EXECUTE JOB');
         ActiveJob::Base.execute(job)
       end
 
@@ -126,6 +129,9 @@ module ActiveElasticJob
       end
 
       def sent_from_docker_host?(request)
+        app_runs_in_docker_container = app_runs_in_docker_container?
+        regexp = request.remote_ip =~ DOCKER_HOST_IP
+        Rails.logger.info("APP IN DOCKER #{app_runs_in_docker_container} REGEXP #{regexp}")
         app_runs_in_docker_container? && request.remote_ip =~ DOCKER_HOST_IP
       end
 
