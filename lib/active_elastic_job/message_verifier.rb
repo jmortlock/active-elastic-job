@@ -14,6 +14,7 @@ module ActiveElasticJob
     end
 
     def verify(message, digest)
+      Rails.logger("MESSAGE #{message} DIGEST #{digest}")
       if message.nil? || message.blank? || digest.nil? || digest.blank?
         return false
       end

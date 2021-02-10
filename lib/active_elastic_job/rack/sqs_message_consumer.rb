@@ -101,8 +101,11 @@ module ActiveElasticJob
       end
 
       def execute_job(request)
+        Rails.logger('VERiFY');
         verify!(request)
+        Rails.logger('LOAD JSON');
         job = JSON.load(request.body)
+        Rails.logger('EXECUTE JOB');        
         ActiveJob::Base.execute(job)
       end
 
