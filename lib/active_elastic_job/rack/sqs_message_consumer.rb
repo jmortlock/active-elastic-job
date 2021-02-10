@@ -35,7 +35,7 @@ module ActiveElasticJob
         request = ActionDispatch::Request.new env
         if enabled? && aws_sqsd?(request)
           Rails.logger.info("REQUEST IS LOCAL #{request.local?}")
-          Rails.logger.info("#{request}")
+          Rails.logger.info("REMOTE IP: #{request.remote_ip}, REMOTE ADDR: #{request.remote_ip}, LOCALHOST: #{ActionDispatch::Request::LOCALHOST}")
           Rails.logger.info("******************")
           unless request.local? || sent_from_docker_host?(request)
             Rails.logger.info("REQUEST IS NOT LOCAL OR FROM THE DOMAIN")
@@ -104,11 +104,11 @@ module ActiveElasticJob
       end
 
       def execute_job(request)
-        Rails.logger('VERiFY');
+        Rails.logger.info('VERIFY');
         verify!(request)
-        Rails.logger('LOAD JSON');
+        Rails.logger.info('LOAD JSON');
         job = JSON.load(request.body)
-        Rails.logger('EXECUTE JOB');
+        Rails.logger.info('EXECUTE JOB');
         ActiveJob::Base.execute(job)
       end
 
@@ -131,7 +131,7 @@ module ActiveElasticJob
       def sent_from_docker_host?(request)
         app_runs_in_docker_container = app_runs_in_docker_container?
         regexp = request.remote_ip =~ DOCKER_HOST_IP
-        Rails.logger.info("APP IN DOCKER #{app_runs_in_docker_container} REGEXP #{regexp}")
+        Rails.logger.info("APP IN DOCKER #{app_runs_in_docker_container}, DOCKER_HOST_IP #{DOCKER_HOST_IP}, REGEXPMATCH #{regexp}")
         app_runs_in_docker_container? && request.remote_ip =~ DOCKER_HOST_IP
       end
 
