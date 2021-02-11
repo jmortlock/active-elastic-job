@@ -136,6 +136,7 @@ module ActiveElasticJob
       end
 
       def originates_from_docker_ip?(request)
+        (request.remote_addr =~ DOCKER_HOST_IP).present? or
         (request.remote_ip =~ DOCKER_HOST_IP).present?
       end
 
