@@ -130,12 +130,12 @@ module ActiveElasticJob
 
       def sent_from_docker_host?(request)
         app_runs_in_docker_container = app_runs_in_docker_container?
-        from_docker_ip = originates_from_docker_ip?
+        from_docker_ip = originates_from_docker_ip?(request)
         Rails.logger.info("APP IN DOCKER #{app_runs_in_docker_container}, DOCKER_HOST_IP #{DOCKER_HOST_IP}, REGEXPMATCH #{from_docker_ip}")
-        app_runs_in_docker_container? && originates_from_docker_ip?
+        app_runs_in_docker_container? && originates_from_docker_ip?(request)
       end
 
-      def originates_from_docker_ip?
+      def originates_from_docker_ip?(request)
         (request.remote_ip =~ DOCKER_HOST_IP).present?
       end
 
